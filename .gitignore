@@ -1,0 +1,22 @@
+# Gradle & Android build files
+.gradle/
+build/
+*/build/
+app/build/
+android/build/
+android/app/build/
+*.iml
+.idea/
+local.properties
+.cxx/
+
+# Output packages
+*.apk
+*.aab
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.swp
+__pycache__/
+*.pyc

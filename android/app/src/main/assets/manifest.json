@@ -1,0 +1,18 @@
+{
+  "name": "IronTrack — Дневник тренировок",
+  "short_name": "IronTrack",
+  "description": "Персональный трекер тренировок, рабочих весов и силового прогресса в зале",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0d12",
+  "theme_color": "#0a0d12",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
