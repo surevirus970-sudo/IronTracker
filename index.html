@@ -3,192 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>IronTrack — Дневник тренировок и прогресса</title>
-  
+  <title>IronTrack — Duolingo x Dota 2 Gym</title>
+
   <!-- PWA Meta -->
-  <meta name="theme-color" content="#0a0d12">
+  <meta name="theme-color" content="#131f24">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
-  
+
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- ВЕРХНЯЯ ШАПКА ПРИЛОЖЕНИЯ -->
-  <header class="app-header">
-    <div class="brand">
-      <div class="brand-icon">⚡</div>
-      <div class="brand-title">IronTrack</div>
+  <!-- ================= ВЕРХНИЙ БАР DUOLINGO ================= -->
+  <header class="duo-header">
+    <div class="header-pills">
+      <!-- Счетчик тренировок в неделю (вместо дней подряд) -->
+      <div class="stat-pill flame" title="Тренировок на этой неделе" onclick="IronTrack.switchTab('settings')">
+        <span>🔥</span>
+        <span id="hdr-weekly-counter">0/4</span>
+      </div>
+
+      <!-- Кристаллы / Тоннаж -->
+      <div class="stat-pill gems" title="Суммарный тоннаж">
+        <span>💎</span>
+        <span id="hdr-total-tonnage">0т</span>
+      </div>
     </div>
-    <div class="header-actions">
-      <button class="btn-icon" title="Открыть на телефоне (QR)" onclick="IronTrack.openModal('phone-connect-modal')">
-        📱
-      </button>
-      <button class="btn-icon" title="Калькулятор блинов" onclick="IronTrack.openModal('plate-calculator-modal')">
-        ⚖️
-      </button>
+
+    <!-- Медаль ранга Dota 2 -->
+    <div class="stat-pill rank-badge" title="Ваш ранг в Dota Gym" onclick="IronTrack.switchTab('hero')">
+      <div class="rank-badge-icon" id="hdr-rank-icon">
+        <!-- SVG медаль -->
+      </div>
+      <span id="hdr-rank-name" style="font-size: 12px; font-weight: 900;">Рекрут 1</span>
     </div>
   </header>
 
-  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <!-- ================= ОСНОВНОЙ КОНТЕНТ ================= -->
   <main class="main-content">
 
-    <!-- ================= ВКЛАДКА 1: ТРЕНИРОВКА (ГЛАВНАЯ) ================= -->
+    <!-- ========== ВКЛАДКА 1: КАТКА / ЗАЛ ========== -->
     <section id="tab-train" class="tab-pane active">
-      <!-- Баннер общей статистики -->
-      <div class="stats-banner">
-        <div class="stat-item">
-          <div class="stat-value" id="dash-total-workouts">0</div>
-          <div class="stat-label">Тренировок</div>
+
+      <!-- Недельный прогресс-бар в стиле Duolingo -->
+      <div class="weekly-goal-card">
+        <div class="weekly-goal-header">
+          <span id="weekly-progress-text">🔥 0 из 4 тренировок на этой неделе</span>
+          <span style="color: var(--duo-gold); cursor: pointer;" onclick="IronTrack.switchTab('settings')">Изменить цель ›</span>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="dash-total-tonnage">0 т</div>
-          <div class="stat-label">Тоннаж</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="dash-total-sets">0</div>
-          <div class="stat-label">Подходов</div>
+        <div class="duo-progress-bar-bg">
+          <div class="duo-progress-bar-fill" id="weekly-progress-fill" style="width: 0%;"></div>
         </div>
       </div>
 
-      <!-- Баннер возобновления активной тренировки (если свернута) -->
-      <div id="resume-workout-banner" style="display: none; margin-bottom: 16px;">
-        <div style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%); border: 1px solid var(--accent); border-radius: var(--radius-md); padding: 14px; display: flex; align-items: center; justify-content: space-between;">
-          <div>
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 0.5px;">Тренировка в процессе</div>
-            <div id="resume-workout-name" style="font-size: 16px; font-weight: 800; color: #fff;">Тренировка</div>
-          </div>
-          <button class="btn-primary" onclick="IronTrack.resumeActiveWorkout()" style="width: auto; padding: 8px 16px; font-size: 14px;">
-            Продолжить ›
-          </button>
-        </div>
-      </div>
-
-      <!-- Главный блок старта -->
-      <div class="hero-card">
-        <div class="hero-title">Готовы к тренировке?</div>
-        <div class="hero-sub">Записывайте рабочие веса, отслеживайте отдых и бейте личные рекорды.</div>
-        <button class="btn-primary" onclick="IronTrack.startEmptyWorkout()">
-          <span style="font-size: 18px;">+</span> Начать пустую тренировку
+      <!-- Главный баннер начала матча -->
+      <div class="hero-match-banner">
+        <div class="hero-title">ПОРА ТАЩИТЬ В ЗАЛЕ!</div>
+        <div class="hero-sub">Качай веса, повышай MMR каждой мышцы и апай Титана.</div>
+        <button class="btn-duo btn-duo-green" style="width: 100%; font-size: 16px;" onclick="IronTrack.startEmptyWorkout()">
+          ⚔️ НАЧАТЬ РЕЙТИНГОВУЮ КАТКУ
         </button>
       </div>
 
-      <!-- Шаблоны тренировок -->
+      <!-- Программы тренировок -->
       <div class="section-header">
-        <div class="section-title">Готовые программы</div>
+        <div class="section-title">Готовые сплиты</div>
       </div>
-      <div class="template-grid" id="templates-list">
-        <!-- Генерируется из app.js -->
-      </div>
-    </section>
-
-    <!-- ================= ВКЛАДКА 2: КАТАЛОГ УПРАЖНЕНИЙ ================= -->
-    <section id="tab-exercises" class="tab-pane">
-      <div class="search-box" style="margin-bottom: 12px;">
-        <span style="color: var(--text-dim);">🔍</span>
-        <input type="text" id="catalog-search-input" placeholder="Поиск упражнения...">
-      </div>
-
-      <!-- Чипсы мышечных групп -->
-      <div class="chips-scroll" id="muscle-filter-chips" style="margin-bottom: 16px;">
-        <button class="chip active" data-muscle="Все" onclick="IronTrack.setMuscleFilter('Все')">Все</button>
-        <button class="chip" data-muscle="Грудь" onclick="IronTrack.setMuscleFilter('Грудь')">Грудь</button>
-        <button class="chip" data-muscle="Спина" onclick="IronTrack.setMuscleFilter('Спина')">Спина</button>
-        <button class="chip" data-muscle="Ноги" onclick="IronTrack.setMuscleFilter('Ноги')">Ноги</button>
-        <button class="chip" data-muscle="Плечи" onclick="IronTrack.setMuscleFilter('Плечи')">Плечи</button>
-        <button class="chip" data-muscle="Бицепс" onclick="IronTrack.setMuscleFilter('Бицепс')">Бицепс</button>
-        <button class="chip" data-muscle="Трицепс" onclick="IronTrack.setMuscleFilter('Трицепс')">Трицепс</button>
-        <button class="chip" data-muscle="Пресс" onclick="IronTrack.setMuscleFilter('Пресс')">Пресс</button>
-      </div>
-
-      <div class="exercise-select-list" id="catalog-exercise-list">
+      <div id="templates-grid">
         <!-- Заполняется динамически -->
       </div>
     </section>
 
-    <!-- ================= ВКЛАДКА 3: ИСТОРИЯ ================= -->
+    <!-- ========== ВКЛАДКА 2: ГЕРОЙ / МЫШЦЫ (DOTA 2 RADAR) ========== -->
+    <section id="tab-hero" class="tab-pane">
+
+      <!-- Главная медаль профиля -->
+      <div class="duo-card" style="text-align: center; padding: 20px;">
+        <div class="dota-medal-container">
+          <div class="dota-medal-svg-box" id="hero-main-medal-svg">
+            <!-- SVG медаль -->
+          </div>
+          <div class="dota-stars-row" id="hero-main-stars">⭐⭐⭐</div>
+          <div class="dota-rank-name" id="hero-main-rank-title">Рекрут 1</div>
+          <div class="dota-mmr-badge" id="hero-main-mmr">1250 MMR</div>
+        </div>
+      </div>
+
+      <!-- Пятиугольник баланса характеристик героя (Dota Radar) -->
+      <div class="radar-canvas-container">
+        <div style="font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 2px;">
+          БАЛАНС ХАРАКТЕРИСТИК ГЕРОЯ
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+          Паутинная диаграмма развития всех мышечных групп
+        </div>
+        <div class="radar-canvas-wrapper">
+          <canvas id="dota-radar-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Список мышц с их Dota 2 рангами -->
+      <div class="section-header">
+        <div class="section-title">Рейтинг мышечных групп</div>
+      </div>
+      <div id="muscle-ranks-list">
+        <!-- Заполняется динамически -->
+      </div>
+    </section>
+
+    <!-- ========== ВКЛАДКА 3: РЕЙТИНГ УПРАЖНЕНИЙ ========== -->
+    <section id="tab-ranks" class="tab-pane">
+      <div class="section-header">
+        <div class="section-title">Таблица рангов упражнений</div>
+      </div>
+      <div id="exercise-ranks-list">
+        <!-- Заполняется динамически -->
+      </div>
+    </section>
+
+    <!-- ========== ВКЛАДКА 4: ИСТОРИЯ МАТЧЕЙ ========== -->
     <section id="tab-history" class="tab-pane">
       <div class="section-header">
-        <div class="section-title">Прошедшие тренировки</div>
+        <div class="section-title">История рейтинговых каток</div>
       </div>
-      <div id="history-list">
+      <div id="match-history-list">
         <!-- Заполняется динамически -->
       </div>
     </section>
 
-    <!-- ================= ВКЛАДКА 4: АНАЛИТИКА И ПРОГРЕСС ================= -->
-    <section id="tab-analytics" class="tab-pane">
-      <div class="section-header">
-        <div class="section-title">Силовой прогресс</div>
-      </div>
-
-      <div class="chart-card">
-        <div class="form-group" style="margin-bottom: 12px;">
-          <label class="form-label">Выберите упражнение:</label>
-          <select class="form-input" id="analytics-exercise-select" onchange="IronTrack.onAnalyticsSelectChange(this.value)">
-            <!-- Заполняется динамически -->
-          </select>
-        </div>
-
-        <div class="canvas-wrapper">
-          <canvas id="progress-canvas"></canvas>
-        </div>
-
-        <div id="chart-pr-stats">
-          <!-- Рекорды по упражнению -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= ВКЛАДКА 5: НАСТРОЙКИ И ИНСТРУМЕНТЫ ================= -->
+    <!-- ========== ВКЛАДКА 5: НАСТРОЙКИ ========== -->
     <section id="tab-settings" class="tab-pane">
       <div class="section-header">
-        <div class="section-title">Подключение телефона</div>
+        <div class="section-title">Цель тренировок в неделю</div>
       </div>
 
-      <div class="template-card" onclick="IronTrack.openModal('phone-connect-modal')">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <div style="font-size: 28px;">📱</div>
-          <div>
-            <div style="font-size: 16px; font-weight: 700; color: #fff;">Открыть на Android-смартфоне</div>
-            <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Запустите приложение прямо с экрана телефона и добавьте на главный экран</div>
-          </div>
+      <div class="duo-card">
+        <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">
+          Сколько раз в неделю вы хотите тренироваться?
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: space-between;">
+          <button class="btn-duo btn-duo-secondary btn-duo-mini" onclick="IronTrack.setWeeklyGoal(2)">2 дня</button>
+          <button class="btn-duo btn-duo-secondary btn-duo-mini" onclick="IronTrack.setWeeklyGoal(3)">3 дня</button>
+          <button class="btn-duo btn-duo-green btn-duo-mini" onclick="IronTrack.setWeeklyGoal(4)">4 дня</button>
+          <button class="btn-duo btn-duo-secondary btn-duo-mini" onclick="IronTrack.setWeeklyGoal(5)">5 дней</button>
+          <button class="btn-duo btn-duo-secondary btn-duo-mini" onclick="IronTrack.setWeeklyGoal(6)">6 дней</button>
         </div>
       </div>
 
       <div class="section-header">
-        <div class="section-title">Инструменты зала</div>
+        <div class="section-title">Установка приложения на телефон</div>
       </div>
 
-      <div class="template-card" onclick="IronTrack.openModal('plate-calculator-modal')" style="margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <div style="font-size: 28px;">⚖️</div>
-          <div>
-            <div style="font-size: 16px; font-weight: 700; color: #fff;">Калькулятор блинов на гриф</div>
-            <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Быстрый расчет блинов для любого рабочего веса</div>
-          </div>
+      <div class="duo-card">
+        <div style="font-weight: 800; color: #fff; margin-bottom: 6px;">📲 Установочный файл .APK</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          Скачайте готовый автономный APK прямо с GitHub на ваш телефон:
         </div>
-      </div>
-
-      <div class="section-header">
-        <div class="section-title">Резервная копия и данные</div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button class="btn-secondary" onclick="IronTrack.exportData()" style="width: 100%; padding: 12px;">
-          💾 Экспорт всех данных в JSON
-        </button>
-
-        <label class="btn-secondary" style="width: 100%; padding: 12px; cursor: pointer; text-align: center;">
-          📥 Импорт данных из файла
-          <input type="file" accept=".json" style="display: none;" onchange="if(this.files[0]) IronTrack.importData(this.files[0])">
-        </label>
-
-        <button class="btn-secondary" onclick="IronTrack.preloadDemoData()" style="width: 100%; padding: 12px; color: var(--gold); border-color: rgba(245, 158, 11, 0.4);">
-          ⭐ Загрузить тестовую неделю тренировок
-        </button>
+        <a href="https://github.com/surevirus970-sudo/IronTracker/releases/download/v1.0.0/IronTrack.apk"
+           class="btn-duo btn-duo-blue" style="width: 100%; text-decoration: none;">
+          📥 СКАЧАТЬ IRONTRACK.APK
+        </a>
       </div>
     </section>
 
@@ -196,28 +172,28 @@
 
   <!-- ================= ПЛАВАЮЩИЙ ТАЙМЕР ОТДЫХА ================= -->
   <div class="rest-timer-bar" id="rest-timer-bar">
-    <div class="timer-info">
-      <div class="timer-circle">
-        <svg width="44" height="44" viewBox="0 0 44 44">
-          <circle cx="22" cy="22" r="18" fill="none" stroke="#263346" stroke-width="3.5" />
-          <circle id="timer-circle-progress" cx="22" cy="22" r="18" fill="none" stroke="#10b981" stroke-width="3.5"
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 44px; height: 44px; position: relative; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; color: var(--duo-green);">
+        <svg width="44" height="44" viewBox="0 0 44 44" style="position: absolute; transform: rotate(-90deg);">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="#263842" stroke-width="4" />
+          <circle id="timer-circle-progress" cx="22" cy="22" r="18" fill="none" stroke="#58cc02" stroke-width="4"
                   stroke-dasharray="113.097" stroke-dashoffset="0" stroke-linecap="round" />
         </svg>
         <span>⏱️</span>
       </div>
-      <div class="timer-text-box">
-        <span class="timer-title">Отдых</span>
-        <span class="timer-display" id="timer-display">01:30</span>
+      <div>
+        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--text-muted);">Отдых</div>
+        <div id="timer-display" style="font-size: 20px; font-weight: 900; color: #fff;">01:30</div>
       </div>
     </div>
-    <div class="timer-controls">
-      <button class="btn-timer-chip" onclick="IronTrack.adjustRestTimer(-15)">-15s</button>
-      <button class="btn-timer-chip" onclick="IronTrack.adjustRestTimer(+30)">+30s</button>
-      <button class="btn-timer-chip" onclick="IronTrack.stopRestTimer()" style="color: #fca5a5;">✕</button>
+    <div style="display: flex; gap: 6px;">
+      <button class="btn-duo btn-duo-secondary btn-duo-mini" onclick="IronTrack.adjustRestTimer(-15)">-15s</button>
+      <button class="btn-duo btn-duo-secondary btn-duo-mini" onclick="IronTrack.adjustRestTimer(+30)">+30s</button>
+      <button class="btn-duo btn-duo-red btn-duo-mini" onclick="IronTrack.stopRestTimer()">✕</button>
     </div>
   </div>
 
-  <!-- ================= ЭКРАН АКТИВНОЙ ТРЕНИРОВКИ ================= -->
+  <!-- ================= ЭКРАН АКТИВНОЙ КАТКИ (ТРЕНИРОВКИ) ================= -->
   <div class="workout-screen" id="active-workout-screen">
     <div class="workout-header">
       <div class="workout-timer-box">
@@ -225,40 +201,40 @@
         <span id="active-workout-timer">00:00</span>
       </div>
       <div style="display: flex; gap: 8px;">
-        <button class="btn-danger" onclick="IronTrack.cancelWorkout()">Отмена</button>
-        <button class="btn-primary" onclick="IronTrack.finishWorkout()" style="width: auto; padding: 10px 18px; font-size: 14px;">
-          Завершить ✓
+        <button class="btn-duo btn-duo-red btn-duo-mini" onclick="IronTrack.cancelWorkout()">Отмена</button>
+        <button class="btn-duo btn-duo-green btn-duo-mini" onclick="IronTrack.finishWorkout()">
+          ПОБЕДА ✓
         </button>
       </div>
     </div>
 
     <div class="workout-content">
-      <input type="text" class="workout-title-input" id="active-workout-name" value="Тренировка"
+      <input type="text" class="workout-title-input" id="active-workout-name" value="Рейтинговая тренировка"
              onchange="IronTrack.updateWorkoutName(this.value)">
 
       <div id="active-workout-exercises">
-        <!-- Карточки упражнений генерируются здесь -->
+        <!-- Карточки упражнений -->
       </div>
     </div>
   </div>
 
-  <!-- ================= НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ ================= -->
+  <!-- ================= НИЖНЯЯ ПАНЕЛЬ DUOLINGO ================= -->
   <nav class="bottom-nav">
     <div class="nav-item active" data-tab="train" onclick="IronTrack.switchTab('train')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 5v14M18 5v14M2 9h4M18 9h4M2 15h4M18 15h4M6 12h12"/></svg>
-      <span>Тренировка</span>
+      <span>Зал</span>
     </div>
-    <div class="nav-item" data-tab="exercises" onclick="IronTrack.switchTab('exercises')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z"/></svg>
-      <span>Каталог</span>
+    <div class="nav-item" data-tab="hero" onclick="IronTrack.switchTab('hero')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Герой</span>
+    </div>
+    <div class="nav-item" data-tab="ranks" onclick="IronTrack.switchTab('ranks')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Рейтинг</span>
     </div>
     <div class="nav-item" data-tab="history" onclick="IronTrack.switchTab('history')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span>История</span>
-    </div>
-    <div class="nav-item" data-tab="analytics" onclick="IronTrack.switchTab('analytics')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      <span>Прогресс</span>
+      <span>Матчи</span>
     </div>
     <div class="nav-item" data-tab="settings" onclick="IronTrack.switchTab('settings')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -266,151 +242,59 @@
     </div>
   </nav>
 
-  <!-- ================= МОДАЛЬНЫЕ ОКНА ================= -->
-
-  <!-- 1. Модалка выбора упражнения -->
+  <!-- ================= МОДАЛКА ВЫБОРА УПРАЖНЕНИЙ ================= -->
   <div class="modal-backdrop" id="exercise-picker-modal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <div class="modal-title">Добавить упражнение</div>
-        <button class="btn-icon" onclick="IronTrack.closeModal('exercise-picker-modal')">✕</button>
+        <div class="modal-title">Выбрать упражнение</div>
+        <button class="btn-duo btn-duo-secondary btn-duo-mini" onclick="IronTrack.closeModal('exercise-picker-modal')">✕</button>
       </div>
       <div class="modal-body">
         <div class="search-box">
           <span>🔍</span>
-          <input type="text" id="modal-exercise-search" placeholder="Поиск...">
+          <input type="text" id="modal-exercise-search" placeholder="Поиск по базе...">
         </div>
-        <div class="exercise-select-list" id="modal-exercise-list">
-          <!-- Заполняется списком упражнений -->
+        <div id="modal-exercise-list">
+          <!-- Список карточек -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. Модалка калькулятора блинов -->
-  <div class="modal-backdrop" id="plate-calculator-modal">
+  <!-- ================= МОДАЛКА ПОБЕДЫ В МАТЧЕ (+MMR) ================= -->
+  <div class="modal-backdrop" id="victory-modal">
     <div class="modal-dialog">
-      <div class="modal-header">
-        <div class="modal-title">Калькулятор блинов</div>
-        <button class="btn-icon" onclick="IronTrack.closeModal('plate-calculator-modal')">✕</button>
+      <div class="modal-header" style="justify-content: center;">
+        <div class="victory-title">🎉 ПОБЕДА!</div>
       </div>
-      <div class="modal-body">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group">
-            <label class="form-label">Целевой вес (кг):</label>
-            <input type="number" step="2.5" class="form-input" id="calc-target-weight" value="80"
-                   oninput="IronTrack.onPlateCalcChange()">
+      <div class="modal-body victory-box">
+        <div class="mmr-delta-display" id="victory-mmr-gain">+30 MMR</div>
+        <div style="font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px;">
+          Текущий ранг героя:
+        </div>
+        <div id="victory-hero-rank" style="font-size: 18px; font-weight: 900; color: var(--duo-gold); margin-bottom: 16px;">
+          Рекрут 1 (1280 MMR)
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+          <div class="duo-card" style="margin: 0; padding: 12px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Тоннаж</div>
+            <div id="victory-tonnage" style="font-size: 20px; font-weight: 900; color: var(--duo-green);">4500 кг</div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Вес грифа:</label>
-            <select class="form-input" id="calc-bar-weight" onchange="IronTrack.onPlateCalcChange()">
-              <option value="20" selected>Олимпийский (20 кг)</option>
-              <option value="15">Женский (15 кг)</option>
-              <option value="10">EZ-гриф (10 кг)</option>
-            </select>
+          <div class="duo-card" style="margin: 0; padding: 12px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Подходов</div>
+            <div id="victory-sets" style="font-size: 20px; font-weight: 900; color: var(--duo-blue);">15</div>
           </div>
         </div>
 
-        <div class="plate-calculator-container">
-          <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">Схема втулки грифа:</div>
-          <div class="barbell-visual">
-            <div class="bar-sleeve" id="bar-sleeve-container">
-              <!-- Отрисовка цветных блинов -->
-            </div>
-          </div>
-          <div id="plate-calc-breakdown" style="font-size: 14px; margin-top: 8px;"></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-primary" onclick="IronTrack.closeModal('plate-calculator-modal')">Готово</button>
+        <button class="btn-duo btn-duo-green" style="width: 100%;" onclick="IronTrack.closeModal('victory-modal')">
+          ПРОДОЛЖИТЬ
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- 3. Модалка поздравления и сводки после тренировки -->
-  <div class="modal-backdrop" id="workout-summary-modal">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <div class="modal-title">🎉 Тренировка завершена!</div>
-        <button class="btn-icon" onclick="IronTrack.closeModal('workout-summary-modal')">✕</button>
-      </div>
-      <div class="modal-body" style="text-align: center;">
-        <div id="summary-pr-badge" style="display: none; background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: #fde68a; font-weight: 800; padding: 8px; border-radius: var(--radius-md); margin-bottom: 14px;">
-          🔥 Новых личных рекордов: 1!
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0;">
-          <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Время</div>
-            <div id="summary-time" style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">45 мин</div>
-          </div>
-          <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Тоннаж</div>
-            <div id="summary-tonnage" style="font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 4px;">4200 кг</div>
-          </div>
-          <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Подходов</div>
-            <div id="summary-sets" style="font-size: 18px; font-weight: 800; color: var(--cyan); margin-top: 4px;">15</div>
-          </div>
-        </div>
-
-        <p style="color: var(--text-muted); font-size: 13px;">Отличная работа! Данные успешно сохранены в историю и учтены в графиках прогресса.</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-primary" onclick="IronTrack.closeModal('workout-summary-modal')">Отлично</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. Модалка подключения смартфона (QR-код и локальный адрес) -->
-  <div class="modal-backdrop" id="phone-connect-modal">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <div class="modal-title">Как открыть на телефоне</div>
-        <button class="btn-icon" onclick="IronTrack.closeModal('phone-connect-modal')">✕</button>
-      </div>
-      <div class="modal-body" style="text-align: center;">
-        <p style="font-size: 14px; color: var(--text-muted);">
-          Убедитесь, что телефон подключен к той же Wi-Fi сети (или раздаче), откройте камеру телефона и отсканируйте код, либо введите адрес в Chrome:
-        </p>
-
-        <div class="qr-box">
-          <div id="phone-qr-container" class="qr-code-img">
-            <!-- QR code image -->
-            <img id="phone-qr-img" style="width: 100%; height: 100%; object-fit: contain;" alt="QR Code">
-          </div>
-          <div class="ip-link-badge" id="phone-ip-url">http://...</div>
-        </div>
-
-        <div style="text-align: left; background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-muted); margin-top: 14px; border: 1px solid var(--border-color);">
-          <div style="font-weight: 700; color: #fff; margin-bottom: 6px;">📲 Как установить как нативное приложение:</div>
-          <div>1. Откройте ссылку в Google Chrome на Android.</div>
-          <div>2. Нажмите меню Chrome (три точки в правом верхнем углу).</div>
-          <div>3. Выберите <b>«Установить приложение»</b> (или «Добавить на главный экран»).</div>
-          <div>4. На экране появится полноценная иконка IronTrack, приложение будет работать офлайн в полный экран!</div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-primary" onclick="IronTrack.closeModal('phone-connect-modal')">Понятно</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Скрипты приложения -->
   <script src="exercises-data.js"></script>
   <script src="app.js"></script>
-  <script>
-    // Инициализация адреса для мобильного телефона
-    (function() {
-      const localUrl = window.location.origin;
-      const ipBadge = document.getElementById('phone-ip-url');
-      if (ipBadge) ipBadge.textContent = localUrl;
-      const qrImg = document.getElementById('phone-qr-img');
-      if (qrImg) {
-        // Бесплатный и надежный генератор QR для адреса
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(localUrl)}`;
-      }
-    })();
-  </script>
 </body>
 </html>
